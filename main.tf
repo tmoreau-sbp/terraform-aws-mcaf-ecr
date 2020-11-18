@@ -1,18 +1,5 @@
 locals {
   ecr_need_policy = length(var.principals_readonly_access) > 0 ? true : false
-  policy_rule_remove_expired_image = [{
-    rulePriority = 2
-    description  = "Expire images older than ${var.max_image_days} days",
-    selection = {
-      tagStatus = "any"
-      countType = "sinceImagePushed"
-      "countUnit" : "days"
-      countNumber = var.max_image_days
-    }
-    action = {
-      type = "expire"
-    }
-  }]
   policy_rule_untagged_image = [{
     rulePriority = 1
     description  = "Remove untagged images"
@@ -47,7 +34,7 @@ resource "aws_ecr_lifecycle_policy" "default" {
   repository = aws_ecr_repository.default[each.value].name
 
   policy = jsonencode({
-    rules = concat(local.policy_rule_untagged_image, local.policy_rule_remove_expired_image)
+    rules = local.policy_rule_untagged_image
   })
 }
 
