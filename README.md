@@ -15,14 +15,14 @@ module "ecr" {
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12 |
-| aws | ~> 3.8.0 |
+| terraform | >= 0.13 |
+| aws | ~> 3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.8.0 |
+| aws | ~> 3.0 |
 
 ## Inputs
 
