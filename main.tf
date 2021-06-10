@@ -1,5 +1,6 @@
 locals {
-  ecr_need_policy = length(var.principals_readonly_access) > 0 ? true : false
+  ecr_policies = merge(local.readonly_ecr_policy, var.ecr_policy_statements)
+
   policy_rule_untagged_image = [{
     rulePriority = 1
     description  = "Remove untagged images"
@@ -12,6 +13,29 @@ locals {
       type = "expire"
     }
   }]
+
+  readonly_ecr_policy = length(var.principals_readonly_access) > 0 ? {
+    "ReadonlyAccess" = {
+      effect = "Allow"
+      principal = {
+        type        = "AWS"
+        identifiers = [for k in var.principals_readonly_access : "arn:aws:iam::${k}:root"]
+      }
+      actions = [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:DescribeImageScanFindings",
+        "ecr:DescribeRepositories",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetLifecyclePolicy",
+        "ecr:GetLifecyclePolicyPreview",
+        "ecr:GetRepositoryPolicy",
+        "ecr:ListImages",
+        "ecr:ListTagsForResource"
+      ]
+    }
+  } : null
 }
 
 resource "aws_ecr_repository" "default" {
@@ -40,35 +64,24 @@ resource "aws_ecr_lifecycle_policy" "default" {
 }
 
 data "aws_iam_policy_document" "default" {
-  count = local.ecr_need_policy ? 1 : 0
+  count = local.ecr_policies != null ? 1 : 0
 
-  statement {
-    sid    = "ReadonlyAccess"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = var.principals_readonly_access
+  dynamic "statement" {
+    for_each = local.ecr_policies
+    content {
+      sid = statement.key
+      principals {
+        type        = statement.value.principal.type
+        identifiers = statement.value.principal.identifiers
+      }
+      actions = statement.value.actions
+      effect  = statement.value.effect
     }
-
-    actions = [
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchGetImage",
-      "ecr:DescribeImages",
-      "ecr:DescribeImageScanFindings",
-      "ecr:DescribeRepositories",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetLifecyclePolicy",
-      "ecr:GetLifecyclePolicyPreview",
-      "ecr:GetRepositoryPolicy",
-      "ecr:ListImages",
-      "ecr:ListTagsForResource"
-    ]
   }
 }
 
 resource "aws_ecr_repository_policy" "default" {
-  for_each   = toset(local.ecr_need_policy ? var.repository_names : [])
+  for_each   = toset(local.ecr_policies != null ? var.repository_names : [])
   repository = aws_ecr_repository.default[each.value].name
   policy     = join("", data.aws_iam_policy_document.default.*.json)
 }

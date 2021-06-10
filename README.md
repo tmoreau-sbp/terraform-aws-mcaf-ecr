@@ -10,6 +10,30 @@ module "ecr" {
 }
 ```
 
+example
+
+```hcl
+module "ecr" {
+  source           = "git@github.com:schubergphilis/terraform-aws-mcaf-ecr.git"
+  repository_names = ["image-x", "namespace/image-y"]
+  bucket_policy_statements = {
+    lambda = {
+      effect = "Allow"
+      principal = { 
+        type        = "service"
+        identifiers = ["lambda.amazonaws.com"]
+      }
+      actions = [
+        ecr:BatchGetImage
+        ecr:DeleteRepositoryPolicy
+        ecr:GetDownloadUrlForLayerecr:GetRepositoryPolicy
+        ecr:SetRepositoryPolicy
+      ]
+    }
+  }
+}
+```
+
 <!--- BEGIN_TF_DOCS --->
 ## Requirements
 
