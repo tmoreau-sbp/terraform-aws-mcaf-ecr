@@ -24,10 +24,10 @@ module "ecr" {
         identifiers = ["lambda.amazonaws.com"]
       }
       actions = [
-        ecr:BatchGetImage
-        ecr:DeleteRepositoryPolicy
-        ecr:GetDownloadUrlForLayerecr:GetRepositoryPolicy
-        ecr:SetRepositoryPolicy
+        "ecr:BatchGetImage",
+        "ecr:DeleteRepositoryPolicy",
+        "ecr:GetDownloadUrlForLayerecr:GetRepositoryPolicy",
+        "ecr:SetRepositoryPolicy"
       ]
     }
   }
