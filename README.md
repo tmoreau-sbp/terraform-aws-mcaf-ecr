@@ -16,7 +16,7 @@ example
 module "ecr" {
   source           = "git@github.com:schubergphilis/terraform-aws-mcaf-ecr.git"
   repository_names = ["image-x", "namespace/image-y"]
-  bucket_policy_statements = {
+  ecr_policy_statements = {
     lambda = {
       effect = "Allow"
       principal = { 
