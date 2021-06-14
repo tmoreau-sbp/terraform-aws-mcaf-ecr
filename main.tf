@@ -71,11 +71,11 @@ data "aws_iam_policy_document" "default" {
     content {
       sid = statement.key
       principals {
-        type        = statement.value.principal.type
+        type        = title(statement.value.principal.type)
         identifiers = statement.value.principal.identifiers
       }
       actions = statement.value.actions
-      effect  = statement.value.effect
+      effect  = title(statement.value.effect)
     }
   }
 }
