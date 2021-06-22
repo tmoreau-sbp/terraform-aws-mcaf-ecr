@@ -1,3 +1,16 @@
+variable "additional_ecr_policy_statements" {
+  type = map(object({
+    effect = string
+    principal = object({
+      type        = string
+      identifiers = list(string)
+    })
+    actions = list(string)
+  }))
+  description = "Map of additional ecr repository policy statements"
+  default     = null
+}
+
 variable "enable_lifecycle_policy" {
   type        = bool
   description = "Set to false to prevent the module from adding any lifecycle policies to any repositories"
@@ -44,4 +57,3 @@ variable "tags" {
   default     = {}
   description = "Mapping of tags"
 }
-
