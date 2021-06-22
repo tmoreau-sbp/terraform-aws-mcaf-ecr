@@ -21,7 +21,8 @@ resource "aws_ecr_repository" "default" {
   tags                 = var.tags
 
   encryption_configuration {
-    encryption_type = "KMS"
+    kms_key         = var.kms_key_arn
+    encryption_type = var.kms_key_arn != null ? "KMS" : "AES256"
   }
 
   image_scanning_configuration {

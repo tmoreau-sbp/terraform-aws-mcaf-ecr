@@ -31,6 +31,7 @@ module "ecr" {
 | repository\_names | list of repository names, names can include namespaces: prefixes ending with a slash (/) | `list(string)` | n/a | yes |
 | enable\_lifecycle\_policy | Set to false to prevent the module from adding any lifecycle policies to any repositories | `bool` | `true` | no |
 | image\_tag\_mutability | The tag mutability setting for the repository. Must be: `MUTABLE` or `IMMUTABLE` | `string` | `"IMMUTABLE"` | no |
+| kms\_key\_arn | The KMS key ARN used for the repository encryption | `string` | `null` | no |
 | max\_image\_days | Expire images older than the given number of days | `number` | `365` | no |
 | principals\_readonly\_access | Principal ARNs to provide with readonly access to the ECR | `list(string)` | `[]` | no |
 | scan\_images\_on\_push | Indicates if images are automatically scanned after being pushed to the repository | `bool` | `true` | no |
