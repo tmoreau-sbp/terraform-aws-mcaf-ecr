@@ -1,4 +1,4 @@
-variable "ecr_policy_statements" {
+variable "additional_ecr_policy_statements" {
   type = map(object({
     effect = string
     principal = object({
@@ -57,4 +57,3 @@ variable "tags" {
   default     = {}
   description = "Mapping of tags"
 }
-
