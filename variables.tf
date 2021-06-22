@@ -10,6 +10,12 @@ variable "image_tag_mutability" {
   description = "The tag mutability setting for the repository. Must be: `MUTABLE` or `IMMUTABLE`"
 }
 
+variable "kms_key_arn" {
+  type        = string
+  default     = null
+  description = "The KMS key ARN used for the repository encryption"
+}
+
 variable "max_image_days" {
   type        = number
   default     = 365
