@@ -29,12 +29,6 @@ variable "kms_key_arn" {
   description = "The KMS key ARN used for the repository encryption"
 }
 
-variable "max_image_days" {
-  type        = number
-  default     = 365
-  description = "Expire images older than the given number of days"
-}
-
 variable "principals_readonly_access" {
   type        = list(string)
   default     = []
