@@ -41,13 +41,12 @@ module "ecr" {
 | Name | Version |
 |------|---------|
 | terraform | >= 0.13 |
-| aws | ~> 3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.0 |
+| aws | n/a |
 
 ## Inputs
 
