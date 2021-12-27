@@ -1,26 +1,29 @@
 # terraform-aws-mcaf-ecr
 Terraform module to setup and manage AWS Elastic Container Registry (ECR) repositories.
 
-Examples:
+## Usage
 
 ```hcl
 module "ecr" {
-  source           = "git@github.com:schubergphilis/terraform-aws-mcaf-ecr.git"
+  source           = "github.com/schubergphilis/terraform-aws-mcaf-ecr"
   repository_names = ["image-x", "namespace/image-y"]
 }
 ```
 
 ```hcl
 module "ecr" {
-  source           = "git@github.com:schubergphilis/terraform-aws-mcaf-ecr.git"
+  source           = "github.com/schubergphilis/terraform-aws-mcaf-ecr"
   repository_names = ["image-x", "namespace/image-y"]
+
   additional_ecr_policy_statements = {
     lambda = {
       effect = "Allow"
+
       principal = { 
         type        = "service"
         identifiers = ["lambda.amazonaws.com"]
       }
+
       actions = [
         "ecr:BatchGetImage",
         "ecr:DeleteRepositoryPolicy",
@@ -38,13 +41,12 @@ module "ecr" {
 | Name | Version |
 |------|---------|
 | terraform | >= 0.13 |
-| aws | ~> 3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.0 |
+| aws | n/a |
 
 ## Inputs
 
