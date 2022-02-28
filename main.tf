@@ -3,10 +3,22 @@ locals {
 
   policy_rule_untagged_image = [{
     rulePriority = 1
-    description  = "Remove untagged images"
+    description  = "Keep only one untagged image, expire all others"
     selection = {
       tagStatus   = "untagged"
       countType   = "imageCountMoreThan"
+      countNumber = 1
+    }
+    action = {
+      type = "expire"
+    }
+  },{
+    rulePriority = 2
+    description  = "Keep untagged images for 1 day"
+    selection = {
+      tagStatus   = "untagged"
+      countType   = "sinceImagePushed"
+      countUnit   = "days"
       countNumber = 1
     }
     action = {
