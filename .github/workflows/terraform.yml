@@ -4,6 +4,10 @@ name: Terraform
 on:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,27 +45,42 @@ jobs:
           tf_actions_comment: true
 
   terraform-docs:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Update module usage docs and push any changes back to PR branch
-        uses: Dirrk/terraform-docs@v1.0.8
+      - name: Render terraform docs inside the README.md and push changes back to PR branch
+        uses: terraform-docs/gh-actions@v1.0.0
         with:
-          tf_docs_args: "--sort-inputs-by-required"
-          tf_docs_git_commit_message: "terraform-docs: Update module usage"
-          tf_docs_git_push: "true"
-          tf_docs_output_file: README.md
-          tf_docs_output_method: inject
-          tf_docs_find_dir: .
+          args: --sort-by required
+          git-commit-message: Update module usage (terraform-docs)
+          git-push: true
+          output-file: README.md
+          output-method: inject
+          recursive: true
+          recursive-path: examples
+        continue-on-error: true # added this to prevent a PR from a remote fork failing the workflow
 
   tfsec:
-    name: tfsec
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Terraform security scan
-        uses: triat/terraform-security-scan@v3.0.0
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          github_token: ${{ github.token }}
+          soft_fail: false
+          tfsec_args: --concise-output --force-all-dirs
+
+      - name: Terraform pr commenter
+        uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
+        with:
+          github_token: ${{ github.token }}
+          tfsec_args: --concise-output --force-all-dirs

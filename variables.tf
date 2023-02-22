@@ -40,6 +40,12 @@ variable "repository_names" {
   description = "list of repository names, names can include namespaces: prefixes ending with a slash (/)"
 }
 
+variable "repository_tags" {
+  type        = map(map(string))
+  default     = {}
+  description = "Mapping of tags for a repository using repository name as key"
+}
+
 variable "scan_images_on_push" {
   type        = bool
   default     = true
