@@ -17,6 +17,12 @@ variable "enable_lifecycle_policy" {
   default     = true
 }
 
+variable "force_delete" {
+  type        = bool
+  default     = false
+  description = "When deleting a repository, force the deletion if it is not empty"
+}
+
 variable "image_tag_mutability" {
   type        = string
   default     = "IMMUTABLE"

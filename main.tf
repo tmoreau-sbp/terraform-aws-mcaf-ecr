@@ -42,6 +42,7 @@ locals {
 resource "aws_ecr_repository" "default" {
   for_each             = toset(var.repository_names)
   name                 = each.value
+  force_delete         = var.force_delete
   image_tag_mutability = var.image_tag_mutability
   tags                 = merge(var.tags, try(var.repository_tags[each.value], {}))
 
