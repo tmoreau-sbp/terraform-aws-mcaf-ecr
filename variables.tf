@@ -63,3 +63,9 @@ variable "tags" {
   default     = {}
   description = "Mapping of tags"
 }
+
+variable "extra_policy_rules" {
+  type        = list(any)
+  default     = []
+  description = "A list of additional policy rules."
+}

@@ -13,7 +13,22 @@ locals {
     action = {
       type = "expire"
     }
-  }]
+  },
+  {
+    rulePriority = 10
+    description  = "Keep a maximum of 5 images"
+    selection = {
+      tagStatus   = "tagged"
+      countNumber = 5
+      countType   = "imageCountMoreThan"
+    }
+    action = [{
+      type = "expire"
+    }]
+  } ]
+
+  # we can only implement 5 rules so slicing extra rules from extra_policy_rules
+  policy_rules_all = concat(local.policy_rule_untagged_image, slice(var.extra_policy_rules, 0, min(4, length(var.extra_policy_rules))))
 
   readonly_ecr_policy = length(var.principals_readonly_access) > 0 ? {
     "ReadonlyAccess" = {
@@ -61,6 +76,7 @@ resource "aws_ecr_lifecycle_policy" "default" {
   repository = aws_ecr_repository.default[each.value].name
 
   policy = jsonencode({
+    # rules = local.policy_rules_all
     rules = local.policy_rule_untagged_image
   })
 }
@@ -85,5 +101,5 @@ data "aws_iam_policy_document" "default" {
 resource "aws_ecr_repository_policy" "default" {
   for_each   = toset(local.ecr_policies != null ? var.repository_names : [])
   repository = aws_ecr_repository.default[each.value].name
-  policy     = join("", data.aws_iam_policy_document.default.*.json)
+  policy     = join("", data.aws_iam_policy_document.default[*].json)
 }
