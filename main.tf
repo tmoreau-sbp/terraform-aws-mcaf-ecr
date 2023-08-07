@@ -1,41 +1,3 @@
-data "aws_ecr_repository_lifecycle_policy" "untagged_image" {
-  rule {
-    rulePriority = 1
-    description  = "Keep untagged images for 1 day"
-    selection = {
-      tagStatus   = "untagged"
-      countType   = "sinceImagePushed"
-      countUnit   = "days"
-      countNumber = 1
-    }
-    action = {
-      type = "expire"
-    }
-  }
-}
-
-data "aws_ecr_repository_lifecycle_policy" "five_image_retention" {
-  rule {
-    rulePriority = 10
-    description  = "Keep a maximum of 5 images"
-    selection = {
-      tagStatus   = "tagged"
-      countNumber = 5
-      countType   = "imageCountMoreThan"
-    }
-    action = [{
-      type = "expire"
-    }]
-  }
-}
-
-data "aws_ecr_repository_lifecycle_policy" "combined" {
-  source_jsons = [
-    "${data.aws_ecr_repository_lifecycle_policy.untagged_image.json}",
-    "${data.aws_ecr_repository_lifecycle_policy.five_image_retention.json}",
-  ]
-}
-
 locals {
   ecr_policies = merge(local.readonly_ecr_policy, var.additional_ecr_policy_statements)
 
@@ -51,35 +13,10 @@ locals {
     action = {
       type = "expire"
     }
-  },
-  {
-    rulePriority = 10
-    description  = "Keep a maximum of 5 images"
-    selection = {
-      tagStatus   = "tagged"
-      countNumber = 5
-      countType   = "imageCountMoreThan"
-    }
-    action = [{
-      type = "expire"
-    }]
-  } ]
-
-  extra_policy_rules = [{
-    rulePriority = 10
-    description  = "Keep a maximum of 5 images"
-    selection = {
-      tagStatus   = "tagged"
-      countNumber = 5
-      countType   = "imageCountMoreThan"
-    }
-    action = [{
-      type = "expire"
-    }]
   }]
 
   # we can only implement 5 rules so slicing extra rules from extra_policy_rules
-  policy_rules_all = concat(local.policy_rule_untagged_image, slice(local.extra_policy_rules, 0, min(4, length(local.extra_policy_rules))))
+  policy_rules_all = concat(local.policy_rule_untagged_image, slice(var.extra_policy_rules, 0, min(4, length(var.extra_policy_rules))))
 
   readonly_ecr_policy = length(var.principals_readonly_access) > 0 ? {
     "ReadonlyAccess" = {
@@ -126,11 +63,41 @@ resource "aws_ecr_lifecycle_policy" "default" {
   for_each   = toset(var.enable_lifecycle_policy ? var.repository_names : [])
   repository = aws_ecr_repository.default[each.value].name
 
-  policy = "${data.aws_ecr_repository_lifecycle_policy.combined.json}"
-  # policy = jsonencode({
-  #   # rules = local.policy_rules_all
-  #   rules = local.policy_rule_untagged_image
+  # policy     = jsonencode({
+  #   rules = local.policy_rules_all
   # })
+
+  policy =<<EOF
+{
+    "rules": [
+        {
+            rulePriority = 1
+            description  = "Keep untagged images for 1 day"
+            selection = {
+                tagStatus   = "untagged"
+                countType   = "sinceImagePushed"
+                countUnit   = "days"
+                countNumber = 1
+            }
+            action = {
+               type = "expire"
+            }
+        },
+        {
+            rulePriority = 10
+            description  = "Keep a maximum of 5 images"
+            selection = {
+                tagStatus   = "tagged"
+                countNumber = 5
+                countType   = "imageCountMoreThan"
+            }
+            action = {
+                type = "expire"
+            }
+        }
+    ]
+}
+EOF
 }
 
 data "aws_iam_policy_document" "default" {
