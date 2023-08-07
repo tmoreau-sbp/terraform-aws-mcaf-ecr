@@ -67,7 +67,7 @@ resource "aws_ecr_lifecycle_policy" "default" {
   #   rules = local.policy_rules_all
   # })
 
-  policy =<<EOF
+  policy = <<EOF
 {
     "rules": [
         {
