@@ -31,6 +31,12 @@ module "ecr" {
         "ecr:GetDownloadUrlForLayerecr:GetRepositoryPolicy",
         "ecr:SetRepositoryPolicy"
       ]
+
+      condition = {
+        test     = "StringEquals"
+        values   = ["account-id"]
+        variable = "aws:PrincipalAccount"
+      }
     }
   }
 }
