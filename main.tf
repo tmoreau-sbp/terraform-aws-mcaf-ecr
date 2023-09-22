@@ -78,6 +78,19 @@ data "aws_iam_policy_document" "default" {
       }
       actions = statement.value.actions
       effect  = title(statement.value.effect)
+
+      dynamic "condition" {
+        for_each = [
+          for condition in statement.value.condition : condition
+          if condition != null
+        ]
+
+        content {
+          test  = statement.value.condition.test
+          variable = statement.value.condition.variable
+          values = statement.value.condition.values
+        }
+      }
     }
   }
 }
