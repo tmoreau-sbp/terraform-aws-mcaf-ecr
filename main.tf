@@ -80,15 +80,12 @@ data "aws_iam_policy_document" "default" {
       effect  = title(statement.value.effect)
 
       dynamic "condition" {
-        for_each = [
-          for condition in statement.value.condition : condition
-          if condition != null
-        ]
+        for_each = statement.value.condition
 
         content {
-          test  = statement.value.condition.test
-          variable = statement.value.condition.variable
-          values = statement.value.condition.values
+          test  = condition.value.test
+          variable = condition.value.variable
+          values = condition.value.values
         }
       }
     }

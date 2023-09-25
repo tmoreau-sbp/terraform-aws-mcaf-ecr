@@ -32,11 +32,13 @@ module "ecr" {
         "ecr:SetRepositoryPolicy"
       ]
 
-      condition = {
-        test     = "StringEquals"
-        values   = ["account-id"]
-        variable = "aws:PrincipalAccount"
-      }
+      condition = [
+        {
+          test     = "StringEquals"
+          values   = ["account-id"]
+          variable = "aws:PrincipalAccount"
+        }
+      ]
     }
   }
 }
