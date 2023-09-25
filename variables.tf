@@ -10,7 +10,7 @@ variable "additional_ecr_policy_statements" {
       test     = string
       variable = string
       values   = list(string)
-    })), [] )
+    })), [])
   }))
   description = "Map of additional ecr repository policy statements"
   default     = null

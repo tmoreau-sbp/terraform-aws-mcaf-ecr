@@ -83,9 +83,9 @@ data "aws_iam_policy_document" "default" {
         for_each = statement.value.condition
 
         content {
-          test  = condition.value.test
+          test     = condition.value.test
           variable = condition.value.variable
-          values = condition.value.values
+          values   = condition.value.values
         }
       }
     }
