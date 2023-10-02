@@ -6,6 +6,11 @@ variable "additional_ecr_policy_statements" {
       identifiers = list(string)
     })
     actions = list(string)
+    condition = optional(list(object({
+      test     = string
+      variable = string
+      values   = list(string)
+    })), [])
   }))
   description = "Map of additional ecr repository policy statements"
   default     = null
